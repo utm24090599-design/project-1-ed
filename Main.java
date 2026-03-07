@@ -18,9 +18,51 @@ Requerimientos Funcionales del Sistema
         El menú de la cafetería cambia con frecuencia: se agregan productos nuevos, se eliminan los agotados y se actualizan precios. El sistema utilizará una lista enlazada abierta para representar el catálogo de productos disponibles. Las operaciones básicas con listas incluyen recorrer el catálogo completo para mostrarlo en pantalla. Además, el sistema debe permitir insertar nuevos elementos en cualquier posición de la lista (al inicio, en medio o al final), así como eliminar elementos cuando un producto se agote o sea retirado del menú, reorganizando los nodos correctamente sin perder la integridad de la cadena.
 
 */
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Random;
 
-class Main {
-    public static void main(String[] args) {
+public class Main {
+    public static void main(String[] args) throws InterruptedException {
+        Queue<Integer> cola = new LinkedList<>();
+        Random rand = new Random();
+        int totalPersonas = 0;
+        int limite = 60;
+        int ventanilla = 0;
 
+        while (totalPersonas < limite) {
+            // Llegan clientes
+            int llegadas = rand.nextInt(1, 4);
+            for (int i = 0; i < llegadas; i++) {
+                if (totalPersonas < limite) {
+                    totalPersonas++;
+                    cola.add(totalPersonas);
+                    System.out.println("Cliente #" + totalPersonas + " entro a la cola.");
+                }
+            }
+
+            System.out.println("Clientes esperando: " + cola.size());
+
+            // Siguiente en ser atendido
+            if (!cola.isEmpty()) {
+                System.out.println("Siguiente en ser atendido: Cliente #" + cola.peek());
+            }
+
+            Thread.sleep(4000);
+
+            // Cajero atiende al primero
+            if (!cola.isEmpty()) {
+                ventanilla++;
+                int atendido = cola.poll();
+                System.out.println("Cliente #" + atendido + " esta siendo atendido en ventanilla " + ventanilla);
+                System.out.println("Clientes en espera tras llamado: " + cola.size());
+            } else {
+                System.out.println("No hay clientes en espera.");
+            }
+
+            Thread.sleep(3000);
+        }
+
+        System.out.println("Se alcanzo el limite de " + limite + " clientes.");
     }
 }
