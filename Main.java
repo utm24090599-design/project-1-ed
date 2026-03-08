@@ -22,6 +22,49 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
+// Clase para el punto control de estaciones(2)
+class ColaCircularEstaciones {
+    private String[] estaciones;
+    private int front, rear, size, capacidad;
+
+    public ColaCircularEstaciones(int n) {
+        this.capacidad = n;
+        this.estaciones = new String[capacidad];
+        this.front = 0;
+        this.rear = -1;
+        this.size = 0;
+    }
+
+    public void enqueue(String estacion) {
+        if (size == capacidad) {
+            System.out.println("Desbordamiento: Estaciones llenas.");
+            return;
+        }
+        rear = (rear + 1) % capacidad;
+        estaciones[rear] = estacion;
+        size++;
+    }
+
+    public String dequeue() {
+        if (size == 0) {
+            System.out.println("Error: No hay estaciones.");
+            return null;
+        }
+        String dato = estaciones[front];
+        front = (front + 1) % capacidad;
+        size--;
+        return dato;
+    }
+
+    public void mostrarEstado() {
+        System.out.print("Estaciones en servicio: [ ");
+        for (int i = 0; i < size; i++) {
+            System.out.print(estaciones[(front + i) % capacidad] + " ");
+        }
+        System.out.println("]");
+    }
+}
+
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         Queue<Integer> cola = new LinkedList<>();
@@ -29,6 +72,12 @@ public class Main {
         int totalPersonas = 0;
         int limite = 60;
         int ventanilla = 0;
+
+        // Crear las 3 estaciones requeridas que son bebidas, comida caliente y snacks
+        ColaCircularEstaciones estacionesCC = new ColaCircularEstaciones(3);
+        estacionesCC.enqueue("Bebidas");
+        estacionesCC.enqueue("Comida Caliente");
+        estacionesCC.enqueue("Snacks");
 
         while (totalPersonas < limite) {
             // Llegan clientes
@@ -43,6 +92,8 @@ public class Main {
 
             System.out.println("Clientes esperando: " + cola.size());
 
+            estacionesCC.mostrarEstado(); // Mostrar el estado actual de las estaciones
+
             // Siguiente en ser atendido
             if (!cola.isEmpty()) {
                 System.out.println("Siguiente en ser atendido: Cliente #" + cola.peek());
@@ -54,7 +105,13 @@ public class Main {
             if (!cola.isEmpty()) {
                 ventanilla++;
                 int atendido = cola.poll();
-                System.out.println("Cliente #" + atendido + " esta siendo atendido en ventanilla " + ventanilla);
+                
+                // --- Integración del Punto 2 ---
+                String estacionActual = estacionesCC.dequeue(); 
+                System.out.println("Cliente #" + atendido + " esta siendo atendido en " + estacionActual + " en ventanilla " + ventanilla);
+                estacionesCC.enqueue(estacionActual);
+                // -------------------------------
+                
                 System.out.println("Clientes en espera tras llamado: " + cola.size());
             } else {
                 System.out.println("No hay clientes en espera.");
@@ -62,7 +119,7 @@ public class Main {
 
             Thread.sleep(3000);
         }
-
+        
         System.out.println("Se alcanzo el limite de " + limite + " clientes.");
     }
 }
