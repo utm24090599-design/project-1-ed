@@ -21,6 +21,7 @@ Requerimientos Funcionales del Sistema
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Stack;
 
 // Clase para el punto control de estaciones(2)
 class ColaCircularEstaciones {
@@ -72,6 +73,7 @@ public class Main {
         int totalPersonas = 0;
         int limite = 60;
         int ventanilla = 0;
+        Stack<String> historialPedidos = new Stack<>();
 
         // Crear las 3 estaciones requeridas que son bebidas, comida caliente y snacks
         ColaCircularEstaciones estacionesCC = new ColaCircularEstaciones(3);
@@ -80,13 +82,13 @@ public class Main {
         estacionesCC.enqueue("Snacks");
 
         while (totalPersonas < limite) {
-            // Llegan clientes
+            // 1. Llegan clientes (Aquí solo entran a la fila)
             int llegadas = rand.nextInt(1, 4);
             for (int i = 0; i < llegadas; i++) {
                 if (totalPersonas < limite) {
                     totalPersonas++;
                     cola.add(totalPersonas);
-                    System.out.println("Cliente #" + totalPersonas + " entro a la cola.");
+                    System.out.println("Cliente #" + totalPersonas + " entró a la cola.");
                 }
             }
 
@@ -101,9 +103,23 @@ public class Main {
 
             Thread.sleep(4000);
 
-            // Cajero atiende al primero
+            // 2. Cajero atiende al primero (AQUÍ ES DONDE VA LA PILA)
             if (!cola.isEmpty()) {
                 ventanilla++;
+                int atendido = cola.poll(); // Aquí sacamos al cliente de la cola
+                System.out.println("Cliente #" + atendido + " está siendo atendido en ventanilla " + ventanilla);
+
+                // --- AGREGADO CORRECTAMENTE: Punto 3 (Pila) ---
+                String pedidoActual = "Pedido_Cliente_" + atendido;
+                historialPedidos.push(pedidoActual); // Se guarda al ser procesado
+                System.out.println("Historial: Se registró " + pedidoActual);
+                
+                // Simular un "Deshacer" (Punto 3: operación de extracción)
+                if (rand.nextInt(10) < 2) { 
+                    System.out.println("¡ERROR! El cajero deshizo el pedido: " + historialPedidos.pop());
+                }
+                // ----------------------------------------------
+
                 int atendido = cola.poll();
                 
                 // --- Integración del Punto 2 ---
@@ -119,6 +135,8 @@ public class Main {
 
             Thread.sleep(3000);
         }
+
+        System.out.println("Se alcanzó el límite de " + limite + " clientes.");
         
         System.out.println("Se alcanzo el limite de " + limite + " clientes.");
     }
